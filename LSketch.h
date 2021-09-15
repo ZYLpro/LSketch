@@ -48,7 +48,7 @@ struct link_node
     link_node *next;
 };
 
-class HGSS
+class LSketch
 {
 private:
     hashTable<string> mapTable;
@@ -92,8 +92,8 @@ public:
     map<unsigned int, int> index;
     int buffer_index;
     int edge_num; // count the number of edges in the buffer to assist buffer size analysis. Self loop edge is not included as it does not use additional memory.
-    HGSS(int width, int block, int range, int p_num, int size, int f_num, int sub_s, int window_k, bool usetable, int tablesize = 0);
-    ~HGSS()
+    LSketch(int width, int block, int range, int p_num, int size, int f_num, int sub_s, int window_k, bool usetable, int tablesize = 0);
+    ~LSketch()
     {
         delete[] value;
         cleanupBuffer();
@@ -132,7 +132,7 @@ public:
     int TriangleCounting();
 };
 
-HGSS::HGSS(int width, int block, int range, int p_num, int size, int f_num, int sub_s, int window_k, bool usehashtable, int TableSize) //the side length of matrix, the length of hash addtress list, the number of candidate bucekt
+LSketch::LSketch(int width, int block, int range, int p_num, int size, int f_num, int sub_s, int window_k, bool usehashtable, int TableSize) //the side length of matrix, the length of hash addtress list, the number of candidate bucekt
 // the number of rooms, whether to use hash table, and the size of the table.
 // Hash table which stores the original nodes can be omitted if not needed. For nodequery,
 //  reachability, edgequery not needed. But needed for triangel counting, degree query, and successor / precursor queries.
@@ -156,7 +156,7 @@ HGSS::HGSS(int width, int block, int range, int p_num, int size, int f_num, int 
         mapTable.init(tablesize);
 }
 
-void HGSS::cleanupBuffer()
+void LSketch::cleanupBuffer()
 {
     vector<link_node *>::iterator IT = buffer.begin();
     link_node *e, *tmp;
@@ -171,7 +171,7 @@ void HGSS::cleanupBuffer()
         }
     }
 }
-void HGSS::insert(string s1, string s2, int weight, string l_e, time_t time) // road, without node labels
+void LSketch::insert(string s1, string s2, int weight, string l_e, time_t time) // road, without node labels
 {
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
     unsigned int hash2 = (*hfunc[0])((unsigned char *)(s2.c_str()), s2.length());
@@ -384,7 +384,7 @@ void HGSS::insert(string s1, string s2, int weight, string l_e, time_t time) // 
     return;
 }
 
-void HGSS::insert(string s1, string s2, int weight, string l_A, string l_B, string l_e, time_t time)
+void LSketch::insert(string s1, string s2, int weight, string l_A, string l_B, string l_e, time_t time)
 {
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
     unsigned int hash2 = (*hfunc[0])((unsigned char *)(s2.c_str()), s2.length());
@@ -610,7 +610,7 @@ void HGSS::insert(string s1, string s2, int weight, string l_A, string l_B, stri
     return;
 }
 /*type 0 is for successor query, type 1 is for precusor query*/
-int HGSS::nodeValueQuery(string s1, int type, time_t end_time) // road
+int LSketch::nodeValueQuery(string s1, int type, time_t end_time) // road
 {
     int weight = 0;
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
@@ -709,7 +709,7 @@ int HGSS::nodeValueQuery(string s1, int type, time_t end_time) // road
     return weight;
 }
 
-int HGSS::nodeValueQueryWithLabel(string s1, string l_e, int type, time_t end_time) // road
+int LSketch::nodeValueQueryWithLabel(string s1, string l_e, int type, time_t end_time) // road
 {
     int weight = 0;
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
@@ -878,7 +878,7 @@ int HGSS::nodeValueQueryWithLabel(string s1, string l_e, int type, time_t end_ti
 }
 
 /*type 0 is for successor query, type 1 is for precusor query*/
-int HGSS::nodeValueQuery(string s1, int type, string l_A, time_t end_time)
+int LSketch::nodeValueQuery(string s1, int type, string l_A, time_t end_time)
 {
     int weight = 0;
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
@@ -983,7 +983,7 @@ int HGSS::nodeValueQuery(string s1, int type, string l_A, time_t end_time)
     return weight;
 }
 
-int HGSS::nodeValueQueryWithLabel(string s1, string l_e, int type, string l_A, time_t end_time)
+int LSketch::nodeValueQueryWithLabel(string s1, string l_e, int type, string l_A, time_t end_time)
 {
     int weight = 0;
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
@@ -1160,7 +1160,7 @@ int HGSS::nodeValueQueryWithLabel(string s1, string l_e, int type, string l_A, t
     return weight;
 }
 
-// void HGSS::nodeSuccessorQuery(string s1, vector<string>&IDs)// query the successors of a node, s1 is the ID of the queried node. results are put in the vector, hash table needed.
+// void LSketch::nodeSuccessorQuery(string s1, vector<string>&IDs)// query the successors of a node, s1 is the ID of the queried node. results are put in the vector, hash table needed.
 // {
 // 	unsigned int hash1 = (*hfunc[0])((unsigned char*)(s1.c_str()), s1.length());
 // 	int tmp=pow(2,f)-1;
@@ -1217,7 +1217,7 @@ int HGSS::nodeValueQueryWithLabel(string s1, string l_e, int type, string l_A, t
 // 		delete []tmp1;
 // 		return;
 // }
-// void HGSS::nodePrecursorQuery(string s1, vector<string>&IDs) // same as successor query
+// void LSketch::nodePrecursorQuery(string s1, vector<string>&IDs) // same as successor query
 // {
 // 	unsigned int hash1 = (*hfunc[0])((unsigned char*)(s1.c_str()), s1.length());
 // 	int tmp=pow(2,f)-1;
@@ -1285,7 +1285,7 @@ int HGSS::nodeValueQueryWithLabel(string s1, string l_e, int type, string l_A, t
 // 		delete []tmp1;
 // 		return;
 // }
-int HGSS::edgeQuery(string s1, string s2, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return the weight of the edge
+int LSketch::edgeQuery(string s1, string s2, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return the weight of the edge
 {
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
     unsigned int hash2 = (*hfunc[0])((unsigned char *)(s2.c_str()), s2.length());
@@ -1361,7 +1361,7 @@ int HGSS::edgeQuery(string s1, string s2, time_t end_time) // s1 is the ID of th
     return 0;
 }
 
-int HGSS::edgeQueryWithLabel(string s1, string s2, string l_e, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return the weight of the edge
+int LSketch::edgeQueryWithLabel(string s1, string s2, string l_e, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return the weight of the edge
 {
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
     unsigned int hash2 = (*hfunc[0])((unsigned char *)(s2.c_str()), s2.length());
@@ -1475,7 +1475,7 @@ int HGSS::edgeQueryWithLabel(string s1, string s2, string l_e, time_t end_time) 
     return 0;
 }
 
-int HGSS::edgeQuery(string s1, string l_A, string s2, string l_B, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return the weight of the edge
+int LSketch::edgeQuery(string s1, string l_A, string s2, string l_B, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return the weight of the edge
 {
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
     unsigned int hash2 = (*hfunc[0])((unsigned char *)(s2.c_str()), s2.length());
@@ -1557,7 +1557,7 @@ int HGSS::edgeQuery(string s1, string l_A, string s2, string l_B, time_t end_tim
     return 0;
 }
 
-int HGSS::edgeQueryWithLabel(string s1, string l_A, string s2, string l_B, string l_e, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return the weight of the edge
+int LSketch::edgeQueryWithLabel(string s1, string l_A, string s2, string l_B, string l_e, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return the weight of the edge
 {
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
     unsigned int hash2 = (*hfunc[0])((unsigned char *)(s2.c_str()), s2.length());
@@ -1675,7 +1675,7 @@ int HGSS::edgeQueryWithLabel(string s1, string l_A, string s2, string l_B, strin
     delete[] tmp2;
     return 0;
 }
-bool HGSS::query(string s1, string s2, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return whether reachable.
+bool LSketch::query(string s1, string s2, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return whether reachable.
 {
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
     unsigned int hash2 = (*hfunc[0])((unsigned char *)(s2.c_str()), s2.length());
@@ -1829,7 +1829,7 @@ bool HGSS::query(string s1, string s2, time_t end_time) // s1 is the ID of the s
     return false;
 }
 
-bool HGSS::queryWithLabel(string s1, string s2, string l_e, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return whether reachable.
+bool LSketch::queryWithLabel(string s1, string s2, string l_e, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return whether reachable.
 {
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
     unsigned int hash2 = (*hfunc[0])((unsigned char *)(s2.c_str()), s2.length());
@@ -2031,7 +2031,7 @@ bool HGSS::queryWithLabel(string s1, string s2, string l_e, time_t end_time) // 
     return false;
 }
 
-bool HGSS::query(string s1, string l_A, string s2, string l_B, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return whether reachable.
+bool LSketch::query(string s1, string l_A, string s2, string l_B, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return whether reachable.
 {
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
     unsigned int hash2 = (*hfunc[0])((unsigned char *)(s2.c_str()), s2.length());
@@ -2189,7 +2189,7 @@ bool HGSS::query(string s1, string l_A, string s2, string l_B, time_t end_time) 
     return false;
 }
 
-bool HGSS::queryWithLabel(string s1, string l_A, string s2, string l_B, string l_e, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return whether reachable.
+bool LSketch::queryWithLabel(string s1, string l_A, string s2, string l_B, string l_e, time_t end_time) // s1 is the ID of the source node, s2 is the ID of the destination node, return whether reachable.
 {
     unsigned int hash1 = (*hfunc[0])((unsigned char *)(s1.c_str()), s1.length());
     unsigned int hash2 = (*hfunc[0])((unsigned char *)(s2.c_str()), s2.length());
@@ -2396,7 +2396,7 @@ bool HGSS::queryWithLabel(string s1, string l_A, string s2, string l_B, string l
 }
 
 // /*type 0 is for successor query, type 1 is for precusor query*/
-// int HGSS::nodeDegreeQuery(string s1, int type) // s1 is the ID of the queried node, return the in/out degree
+// int LSketch::nodeDegreeQuery(string s1, int type) // s1 is the ID of the queried node, return the in/out degree
 // {
 // 	int degree = 0;
 // 	unsigned int hash1 = (*hfunc[0])((unsigned char*)(s1.c_str()), s1.length());
@@ -2534,7 +2534,7 @@ bool HGSS::queryWithLabel(string s1, string l_A, string s2, string l_B, string l
 // 	return;
 // }
 
-// int HGSS::TriangleCounting()
+// int LSketch::TriangleCounting()
 // {
 // 	GSketch* gs = new GSketch;
 // 	for(int i=0;i<tablesize;i++)
